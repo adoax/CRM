@@ -8,10 +8,14 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ApiResource
+ * @ApiResource(
+ *      normalizationContext={
+ *          "groups"={"users_read"}
+ *      })
  */
 class User implements UserInterface
 {
@@ -19,37 +23,45 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"customers_read", "invoices_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresource", "users_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"customers_read", "invoices_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresource", "users_read"})
+     * @Assert\NotBlank(message="Votre email est obligatoire")
+     * @Assert\Email(message="Votre adresse mail doit être valide")
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
-     * @Groups({"customers_read", "invoices_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresource", "users_read"})
      */
     private $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="Le mot de passe et obligatoire")
+     * @Assert\length(min=3, minMessage="Votre mot de passe doit faire plus de 3 caractère")
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresource", "users_read"})
+     * @Assert\NotBlank(message="CE champs ne peut pat être vide !")
+     * @Assert\Length(min=2, minMessage="Doit faire plus de 2 caractère", max=40, maxMessage="Votre prenom et beaucoup trop voyont !")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read", "invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read", "invoices_subresource", "users_read"})
+     * @Assert\NotBlank(message="CE champs ne peut pat être vide !")
+     * @Assert\Length(min=2, minMessage="Doit faire plus de 2 caractère", max=40, maxMessage="Votre nom et beaucoup trop voyont !")
      */
     private $lastName;
 
