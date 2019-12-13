@@ -38,7 +38,7 @@ class InvoiceEncoderSubscrider implements EventSubscriberInterface
         $method = $event->getRequest()->getMethod();
 
         if ($invoice instanceof Invoice && $method === "POST") {
-            (int)$chrono = $this->repository->findNextChrono($this->security->getUser());
+            $chrono = $this->repository->findNextChrono($this->security->getUser());
             $invoice->setChrono( $chrono);
         }
     }

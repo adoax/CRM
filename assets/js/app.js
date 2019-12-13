@@ -9,6 +9,10 @@ import HomePage from "./pages/HomePage";
 import InvoicesPage from "./pages/InvoicesPage";
 import LoginPage from "./pages/LoginPage";
 import AuthAPI from "./services/AuthAPI.Js";
+import LoginRoute from "./Components/LoginRoute";
+import CustomerPage from "./pages/CustomerPage";
+import InvoicePage from "./pages/InvoicePage";
+import RegisterPage from "./pages/RegisterPage";
 
 // any CSS you require will output into a single css file (app.css in this case)
 require("../css/app.css");
@@ -25,15 +29,18 @@ const App = () => {
   const NavBarWithRouter = withRouter(Navbar);
 
   return (
-    <AuthContext.Provider value={{isAuth, setIsAuth}}>
+    <AuthContext.Provider value={{ isAuth, setIsAuth }}>
       <HashRouter>
         <NavBarWithRouter />
 
         <main className="container pt-5">
           <Switch>
-            <Route path="/login" component={LoginPage} />
-            <PrivateRoute path="/invoices" component={InvoicesPage} />
+            <LoginRoute path="/login" component={LoginPage} />
+            <LoginRoute path="/register" component={RegisterPage} />
+            <PrivateRoute path="/customers/:id" component={CustomerPage} />
             <PrivateRoute path="/customers" component={CustomersPages} />
+            <PrivateRoute path="/invoices/:id" component={InvoicePage} />
+            <PrivateRoute path="/invoices" component={InvoicesPage} />
             <Route path="/" component={HomePage} />
           </Switch>
         </main>

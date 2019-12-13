@@ -38,16 +38,16 @@ class Customer
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read", "invoices_read"})
-     * @Assert\NotBlank(message="Le champ Prenom ne peut pas être vide !")
      * @Assert\Length(min=2, minMessage="Votre prenom doit faire plus de 2 caractère", max=20, maxMessage="Votre prenom doit faire moins de 20 caractère")
+     * @Assert\NotBlank(message="Le champ Prenom ne peut pas être vide !")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customers_read", "invoices_read"})
-     * @Assert\NotBlank(message="Le champ Nom ne peut pas être vide !")
      * @Assert\Length(min=2, minMessage="Votre nom doit faire plus de 2 caractère", max=20, maxMessage="Votre nom doit faire moins de 20 caractère")
+     * @Assert\NotBlank(message="Le champ Nom ne peut pas être vide !")
      */
     private $lastName;
 
