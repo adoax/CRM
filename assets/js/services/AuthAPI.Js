@@ -2,12 +2,16 @@ import axios from "axios";
 import CustomerAPI from "./CustomerAPI";
 import jwtDecode from "jwt-decode";
 import { toast } from "react-toastify";
+import Cache from "./cache";
+import { LOGIN_API } from "../config";
 
 //Permet de supprimer le token du localStorage & axios
 function logout() {
   window.localStorage.removeItem("authToken");
   delete axios.defaults.headers["Authorization"];
   toast.success("Vous êtes deconnectez, a bientôt !");
+  Cache.invalidate("customers");
+  Cache.invalidate("invoices");
 }
 /**
  * Positionne le token  JWT sur axios
@@ -24,7 +28,7 @@ function setAxiosToken(token) {
  */
 function authenticate(credentials) {
   return axios
-    .post("http://127.0.0.1:8000/api/login_check", credentials)
+    .post(LOGIN_API, credentials)
     .then(response => response.data.token)
     .then(token => {
       //Stock le token dans le localStorage

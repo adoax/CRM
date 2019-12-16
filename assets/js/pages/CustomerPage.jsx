@@ -124,7 +124,7 @@ const CustomerPage = ({ match, history }) => {
         />
 
         <div className="form-group pt-5">
-          <button className="btn btn-success">Enregistrer</button>
+          <button className="btn btn-success" type="submit">Enregistrer</button>
           <Link to="/customers" className="btn btn-link">
             Retour au clients
           </Link>

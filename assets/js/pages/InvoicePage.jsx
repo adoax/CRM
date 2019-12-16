@@ -79,7 +79,6 @@ const InvoicePage = ({ match, history }) => {
         history.replace("/invoices");
       }
     } catch ({ response }) {
-      console.log(response);
       const { violations } = response.data;
       if (violations) {
         const apiErrors = {};
