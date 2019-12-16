@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Field from "../Components/forms/Field";
 import UserAPI from "../services/UserAPI";
+import { toast } from "react-toastify";
 
 const RegisterPage = ({ history }) => {
   const [user, setUser] = useState({
@@ -11,7 +12,7 @@ const RegisterPage = ({ history }) => {
     passwordConfirm: ""
   });
 
-  const [errors, setErrros] = useState({
+  const [errors, setErrors] = useState({
     lastName: "",
     firstName: "",
     email: "",
@@ -35,13 +36,17 @@ const RegisterPage = ({ history }) => {
     //Gestion de confirmation du mot de passe
     if (user.password !== user.passwordConfirm) {
       apiErrors.passwordConfirm = "Vos mot de passe ne corresponde pas !";
-      setErrros(apiErrors);
+      setErrors(apiErrors);
+      toast.error("Des erreurs dans votre formulaire !");
       return;
     }
 
     try {
       await UserAPI.register(user);
-      setErrros({});
+      setErrors({});
+      toast.success(
+        "Vous êtes désormais inscrit, vous pouvez vous connecter !"
+      );
       history.replace("/login");
     } catch ({ response }) {
       const { violations } = response.data;
@@ -49,8 +54,9 @@ const RegisterPage = ({ history }) => {
         violations.forEach(({ propertyPath, title }) => {
           apiErrors[propertyPath] = title;
         });
-        setErrros(apiErrors);
+        setErrors(apiErrors);
       }
+      toast.error("Des erreurs dans votre formulaire !");
       console.log(response);
     }
     //TODO : erreur requete

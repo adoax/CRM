@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import AuthAPIJs from "../services/AuthAPI.Js";
 import AuthContext from "../context/AuthContext";
 import Field from "../Components/forms/Field";
+import { toast } from "react-toastify";
 
 const LoginPage = ({ history }) => {
   const [credentials, setCredentials] = useState({
@@ -26,8 +27,10 @@ const LoginPage = ({ history }) => {
       setError("");
       setIsAuth(true);
       history.replace("/customers");
+      toast.success("Vous êtes désormais connecté !");
     } catch (error) {
       setError("Adresse Mail ou mot de passe invalide !");
+      toast.error("Une erreur est survenue !");
     }
   };
 

@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Pagination from "../Components/Pagination";
 import InvoiceAPI from "../services/InvoiceAPI";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import TableLoader from "../Components/loaders/TableLoader";
 
 const STATUS_CLASSES = {
   PAID: "success",
@@ -19,14 +21,16 @@ const InvoicesPage = props => {
   const [invoices, setInvoices] = useState([]);
   const [currentPage, SetCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   //Permet de recuperer les Invoives
   const fectInvoices = async () => {
     try {
       const data = await InvoiceAPI.findAll();
       setInvoices(data);
+      setLoading(false);
     } catch (error) {
-      console.log(error.response);
+      toast.error("Erreur lors du chargement des factures !");
     }
   };
 
@@ -37,8 +41,10 @@ const InvoicesPage = props => {
     setInvoices(invoices.filter(invoice => invoice.id !== id));
     try {
       await InvoiceAPI.delete(id);
+      toast.success("La facture a bien été supprimée");
     } catch (error) {
       setInvoices(originalInvoices);
+      toast.error("Une erreur est survenue");
     }
   };
 
@@ -87,6 +93,7 @@ const InvoicesPage = props => {
           Créer une Facture
         </Link>
       </div>
+
       <div className="form-group">
         <input
           onChange={handleSearch}
@@ -96,6 +103,7 @@ const InvoicesPage = props => {
           placeholder="Recherche .."
         ></input>
       </div>
+
       <table className="table table-hover">
         <thead>
           <tr>
@@ -107,39 +115,47 @@ const InvoicesPage = props => {
             <th />
           </tr>
         </thead>
-        <tbody>
-          {paginitedInvoices.map(invoice => (
-            <tr key={invoice.id}>
-              <td>{invoice.chrono}</td>
-              <td>
-                <Link to={"/invoices/" + invoice.id}>
-                  {invoice.customer.firstName} {invoice.customer.lastName}
-                </Link>
-              </td>
-              <td className="text-center">{formatDate(invoice.sendAt)}</td>
-              <td className="text-center">
-                <span
-                  className={"badge badge-" + STATUS_CLASSES[invoice.status]}
-                >
-                  {STATUS_LABEL[invoice.status]}
-                </span>
-              </td>
-              <td className="text-center">
-                {invoice.amout.toLocaleString()} &euro;
-              </td>
-              <td>
-                <button className="btn btn-primary btn-sm mr-1">Editer</button>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDelete(invoice.id)}
-                >
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+        {!loading && (
+          <tbody>
+            {paginitedInvoices.map(invoice => (
+              <tr key={invoice.id}>
+                <td>{invoice.chrono}</td>
+                <td>
+                  <Link to={"/invoices/" + invoice.id}>
+                    {invoice.customer.firstName} {invoice.customer.lastName}
+                  </Link>
+                </td>
+                <td className="text-center">{formatDate(invoice.sendAt)}</td>
+                <td className="text-center">
+                  <span
+                    className={"badge badge-" + STATUS_CLASSES[invoice.status]}
+                  >
+                    {STATUS_LABEL[invoice.status]}
+                  </span>
+                </td>
+                <td className="text-center">
+                  {invoice.amout.toLocaleString()} &euro;
+                </td>
+                <td>
+                  <Link
+                    to={"/invoices/" + invoice.id}
+                    className="btn btn-primary btn-sm mr-1"
+                  >
+                    Editer
+                  </Link>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleDelete(invoice.id)}
+                  >
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        )}
       </table>
+      {loading && <TableLoader />}
       <Pagination
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}

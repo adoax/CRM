@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Field from "../Components/forms/Field";
 import CustomerAPI from "../services/CustomerAPI";
+import { toast } from "react-toastify";
+import FormContentLoader from "../Components/loaders/FormContentLoader";
 
 const CustomerPage = ({ match, history }) => {
   const { id = "new" } = match.params;
@@ -21,6 +23,7 @@ const CustomerPage = ({ match, history }) => {
   });
 
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   //Permte de recuperer un costomers celon son ID
   const fetchCustomer = async id => {
@@ -28,10 +31,10 @@ const CustomerPage = ({ match, history }) => {
       const { firstName, lastName, email, company } = await CustomerAPI.find(
         id
       );
-
+        setLoading(false)
       setCustomer({ firstName, lastName, email, company });
     } catch (error) {
-      console.log(error.response);
+      toast.error("Le client n'a pas pu être chargé");
       history.replace("/customers");
     }
   };
@@ -39,6 +42,7 @@ const CustomerPage = ({ match, history }) => {
   //Au chargement du conposant, determine si il s'agit de faire une modification ou une création d'un customers
   useEffect(() => {
     if (id !== "new") {
+      setLoading(true);
       setEditing(true);
       fetchCustomer(id);
     }
@@ -58,9 +62,11 @@ const CustomerPage = ({ match, history }) => {
     try {
       if (editing) {
         await CustomerAPI.update(id, customer);
+        toast.success("Le client a bien été modifié");
         history.replace("/customers");
       } else {
         await CustomerAPI.create(customer);
+        toast.success("Le client a bien été créé");
         history.replace("/customers");
       }
     } catch ({ response }) {
@@ -72,6 +78,7 @@ const CustomerPage = ({ match, history }) => {
         });
 
         setErrors(apiErrors);
+        toast.error("Des erreurs dans votre formulaire !");
       }
     }
   };
@@ -81,7 +88,7 @@ const CustomerPage = ({ match, history }) => {
       {(!editing && <h1>Création d'un client</h1>) || (
         <h1>Modification du client</h1>
       )}
-
+{!loading && 
       <form onSubmit={handleSubmit}>
         <Field
           name="lastName"
@@ -123,6 +130,9 @@ const CustomerPage = ({ match, history }) => {
           </Link>
         </div>
       </form>
+}
+
+{loading && <FormContentLoader />}
     </>
   );
 };

@@ -2,19 +2,23 @@ import React, { useEffect, useState } from "react";
 import Pagination from "../Components/Pagination";
 import CustomerAPI from "../services/CustomerAPI";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import TableLoader from "../Components/loaders/TableLoader";
 
 const CustomersPages = props => {
   const [customers, setCustomers] = useState([]);
   const [currentPage, SetCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   //Permet de recuperer les customers
   const fetchCustomer = async () => {
     try {
       const data = await CustomerAPI.findAll();
       setCustomers(data);
+      setLoading(false);
     } catch (error) {
-      console.log(error.response);
+      toast.error("Impossible de charger les clients");
     }
   };
   //Au chargement du composent en cherche les customers
@@ -29,8 +33,10 @@ const CustomersPages = props => {
     setCustomers(customers.filter(customer => customer.id !== id));
     try {
       await CustomerAPI.delete(id);
+      toast.success("Le client a bien été supprimé");
     } catch (error) {
       setCustomers(originalCustomers);
+      toast.error("La suppression du client n'a pas pu fonctionner");
     }
   };
 
@@ -92,38 +98,42 @@ const CustomersPages = props => {
             <th />
           </tr>
         </thead>
-        <tbody>
-          {paginitedCustomers.map(customer => (
-            <tr key={customer.id}>
-              <td>{customer.id}</td>
-              <td>
-                <Link to={"/customers/" + customer.id}>
-                  {customer.firstName} {customer.lastName}
-                </Link>
-              </td>
-              <td>{customer.email}</td>
-              <td>{customer.company}</td>
-              <td className="text-center">
-                <span className="badge badge-light">
-                  {customer.invoices.length}
-                </span>
-              </td>
-              <td className="text-center">
-                {customer.totalAmout.toLocaleString()} &euro;
-              </td>
-              <td>
-                <button
-                  className="btn btn-sm btn-danger"
-                  disabled={customer.invoices.length > 0}
-                  onClick={() => handleDelete(customer.id)}
-                >
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+        {!loading && (
+          <tbody>
+            {paginitedCustomers.map(customer => (
+              <tr key={customer.id}>
+                <td>{customer.id}</td>
+                <td>
+                  <Link to={"/customers/" + customer.id}>
+                    {customer.firstName} {customer.lastName}
+                  </Link>
+                </td>
+                <td>{customer.email}</td>
+                <td>{customer.company}</td>
+                <td className="text-center">
+                  <span className="badge badge-light">
+                    {customer.invoices.length}
+                  </span>
+                </td>
+                <td className="text-center">
+                  {customer.totalAmout.toLocaleString()} &euro;
+                </td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    disabled={customer.invoices.length > 0}
+                    onClick={() => handleDelete(customer.id)}
+                  >
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        )}
       </table>
+      {loading && <TableLoader />}
+
       {itemsPerPage < filteredCustomer.length && (
         <Pagination
           currentPage={currentPage}
