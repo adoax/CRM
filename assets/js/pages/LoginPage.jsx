@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 
 const LoginPage = ({ history }) => {
   const [credentials, setCredentials] = useState({
-    username: "a@a.com",
-    password: "azerty"
+    username: "",
+    password: ""
   });
   const [error, setError] = useState("");
   const { setIsAuth } = useContext(AuthContext);
